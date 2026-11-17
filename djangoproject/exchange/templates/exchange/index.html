@@ -1,0 +1,57 @@
+{% extends "base.html" %} <!--se brancher sur base.html, tjs en premier-->
+
+{% block title %}Accueil – Échange de compétences{% endblock %}
+<!--base.html contient un « trou » nommé title. Ici, on le remplit avec le texte « Accueil – Échange de compétences »-->
+
+{% block main %} <!--Même principe pour le trou principal main-->
+<section class="hero"> <!--« Hero » est le nom courant en web pour le grand encadré d’accueil en haut d’une page-->
+    <p class="eyebrow">Entre voisins, tout simplement</p>
+    <h1>Échangez vos compétences<br>avec vos voisins.</h1>
+    <p>Proposez votre aide pour ce que vous savez faire,<br>demandez-en pour le reste.</p>
+    {% if not user.is_authenticated %} <!--Affiche les boutons « S’inscrire » et « Se connecter » seulement au visiteur. Un utilisateur déjà connecté n’en a pas besoin-->
+        <div class="buttons"> <!--boîte qui regroupe les deux boutons-->
+            <a class="button primary" href="{% url 'exchange:signup' %}">S'inscrire</a> <!--texte cliquable-->
+            <a class="button secondary" href="#">Se connecter</a> <!--href="#" est un lien provisoire qui ne mène nulle part car page connexion ne xiste pas encore-->
+        </div>
+    {% endif %}
+</section>
+<!--ferme la boîte des boutons, puis la condition (endif), puis la section-->
+
+<div class="columns">
+    <!--le premier élément (<section>) va à gauche, le deuxième (<aside>) à droite-->
+    <section>
+        <h2>Prochains créneaux d'entraide <span class="count">{{ booked_slots|length }}</span></h2> <!--Le filtre length compte les éléments de la liste, booked_slots est la liste des créneaux envoyée par la vue et { … } signifie  affiche cette valeur -->
+        {% for slot in booked_slots %} <!-- une boucle pour chaque créneau, on ecrit le bloc pour chaque créneau-->
+            <div class="slot"> <!--carte blanche d’un créneau-->
+                <div class="day">
+                    <strong>{{ slot.date|date:"j" }}</strong> <!--Seulement le numéro du jour, Le point . veut dire « va chercher l’information date de ce créneau, date vient de mon modèle
+                                               Le texte entre guillemets est le format : j = le numéro du jour, sans zéro devant
+                                               strong pour dire que le texte est important-->
+                    <span>{{ slot.date|date:"N" }}</span> <!--Le mois en abrégé : « nov. ». Le CSS le mettra en majuscules-->
+                </div>
+                <div>
+                    <p class="full-date">{{ slot.date|date:"l j F Y"|capfirst }}</p>  <!--majuscule a la premiere lettre avec capfirst
+                                                            jour en lettre, numéro du jour, mois en lettres et année sur 4 chiffres-->
+                    <p class="skill">{{ slot.skill.name }}</p> <!--On suit les liens, comme un chemin : créneau, compétence, son nom -->
+                    <p class="text">Un utilisateur a proposé son aide à un autre utilisateur.</p>
+                                    <!--le gabarit n’écrit jamais {{ slot.requester }} ni {{ slot.helper }} car ca doit etre anonyme-->
+                </div>
+            </div>
+        {% empty %} <!--{% empty %} fait partie de la boucle for. Il dit : « si la liste est vide, affiche plutôt ceci »-->
+            <p class="empty">Aucun créneau d'entraide n'est prévu pour le moment.</p>
+        {% endfor %}
+    </section> <!--fin de la boucle puis de la colonne de gauche-->
+
+    <aside> <!--colonne de droite-->
+        <h2>Compétences proposées</h2>
+        <div class="panel">  <!-- boite blanche qui contient les compétences-->
+            {% for skill in skills %} <!--deuxième boucle, même principe : pour chaque compétence de la liste skills envoyée par la vue, on affiche son nom dans une petite étiquette violette-->
+                <span class="tag">{{ skill.name }}</span> <!--<span> plutôt que <div> parce qu’un <span> reste sur la même ligne que le précédent, quand y a plus de place ca passe a la ligne suivante-->
+            {% empty %} <!--si l'admin n'a pas encore créé de compétences on affiche ca-->
+                <p class="empty">Aucune compétence pour le moment.</p>
+            {% endfor %} <!-- fin de la boucle-->
+            <p class="text">Et vous, quel savoir-faire<br>aimeriez-vous partager ?</p>
+        </div>
+    </aside>
+</div>
+{% endblock %}

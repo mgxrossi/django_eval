@@ -2,10 +2,19 @@
 
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
+from django.utils import timezone
+
+from .models import HelpRequest, Skill
 
 def index(request: HttpRequest) -> HttpResponse:
-    """Home page: booked slots (anonymous) and list of skills."""
-    return HttpResponse("Accueil")
+    """page d'accueil avec demandes déja créées et compétences"""
+    today = timezone.localdate()
+    booked_slots = HelpRequest.objects.filter(
+        date__gte=today, helper__isnull=False
+    ).select_related("skill")
+    skills = Skill.objects.all()
+    context = {"booked_slots": booked_slots, "skills": skills}
+    return render(request, "exchange/index.html", context)
 
 
 def signup(request: HttpRequest) -> HttpResponse:

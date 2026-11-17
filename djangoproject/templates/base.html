@@ -1,0 +1,28 @@
+{% load static %}<!DOCTYPE html> <!--charge l’outil qui sait trouver les fichiers CSS. Tjs en tout premier-->
+<html lang="fr"> <!--Indique au navigateur que la page est en français-->
+<head>
+    <meta charset="utf-8"> <!-- pour afficher correctement les accents-->
+    <title>{% block title %}Échange de compétences{% endblock %}</title> <!--Un trou pour le titre de l’onglet. Le texte à l’intérieur est la valeur par défaut, si la page ne le remplit pas-->
+    <link rel="stylesheet" href="{% static 'exchange/style.css' %}"> <!--bon chemin vers ta feuille de style-->
+</head>
+<body>
+<header>
+    {% block header %} <!--Un trou pour le bandeau-->
+    <nav>
+        <a class="brand" href="{% url 'exchange:index' %}">
+            Échange de compétences
+            <small>L'entraide commence tout près</small>
+        </a>
+        <div class="links">
+            {% if user.is_authenticated %} <!--Une condition : si l’utilisateur est connecté, on affiche « Mon espace », sinon « S’inscrire »-->
+                <a href="{% url 'exchange:dashboard' %}">Mon espace</a>
+        {% endif %}
+        </div>
+    </nav>
+    {% endblock %}
+</header>
+<main>
+    {% block main %}{% endblock %} <!--Le trou principal, que chaque page remplit avec son contenu-->
+</main>
+</body>
+</html>
