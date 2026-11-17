@@ -1,11 +1,7 @@
-from django.shortcuts import render
-
-# Create your views here
-
 """Views of the skill exchange application."""
 
 from django.http import HttpRequest, HttpResponse
-
+from django.shortcuts import render
 
 def index(request: HttpRequest) -> HttpResponse:
     """Home page: booked slots (anonymous) and list of skills."""

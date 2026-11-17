@@ -4,7 +4,7 @@ from django.urls import path
 
 from . import views
 
-app_name = "exchange" #app_name crée un espace de noms : dans les gabarits, j'écrirais {% url 'exchange:dashboard' %}
+app_name = "exchange" #app_name crée un espace de noms : dans les gabarits, j'écrirai {% url 'exchange:dashboard' %}
 urlpatterns = [
     #name= donne un nom à chaque adresse. Si je change un jour le chemin, aucun lien ne casse
     path("", views.index, name="index"),
