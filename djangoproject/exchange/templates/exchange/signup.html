@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Inscription – Échange de compétences{% endblock %}
+
+{% block main %}
+<div class="form-page">
+    <h1>Créer un compte</h1>
+    <p class="text">Vos prénom, nom et courriel seront visibles des utilisateurs avec qui vous échangez.</p>
+    <form method="post" class="panel">
+        {% csrf_token %}
+        {{ form.as_div }}
+        <button type="submit" class="button primary">S'inscrire</button>
+    </form>
+    <p class="text">Déjà inscrit(e) ? <a href="{% url 'exchange:login' %}">Se connecter</a></p>
+</div>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Connexion – Échange de compétences{% endblock %}
+
+{% block main %}
+<div class="form-page">
+    <h1>Se connecter</h1>
+    <form method="post" class="panel">
+        {% csrf_token %}
+        {{ form.as_div }}
+        <button type="submit" class="button primary">Se connecter</button>
+    </form>
+    <p class="text">Pas encore de compte ? <a href="{% url 'exchange:signup' %}">S'inscrire</a></p>
+</div>
+{% endblock %}
