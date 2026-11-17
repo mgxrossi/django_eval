@@ -121,3 +121,9 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Authentication: ou allait après avoir login et logout, on utilise le nom des adresses comme dans les gabarits
+LOGIN_URL = "exchange:login"
+LOGIN_REDIRECT_URL = "exchange:dashboard"
+LOGOUT_REDIRECT_URL = "exchange:index"
