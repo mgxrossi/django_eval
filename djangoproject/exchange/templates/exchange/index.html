@@ -37,7 +37,7 @@
                                     <!--le gabarit n’écrit jamais {{ slot.requester }} ni {{ slot.helper }} car ca doit etre anonyme-->
                 </div>
             </div>
-        {% empty %} <!--{% empty %} fait partie de la boucle for. Il dit : « si la liste est vide, affiche plutôt ceci »-->
+        {% empty %} <!--fait partie de la boucle for. Il dit : « si la liste est vide, affiche plutôt ceci »-->
             <p class="empty">Aucun créneau d'entraide n'est prévu pour le moment.</p>
         {% endfor %}
     </section> <!--fin de la boucle puis de la colonne de gauche-->

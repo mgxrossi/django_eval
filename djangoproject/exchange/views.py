@@ -35,9 +35,19 @@ def signup(request: HttpRequest) -> HttpResponse:
     return render(request, "exchange/signup.html", {"form": form})
 
 
+@login_required #une espece de garde comme ca si la personne n'est pas connectée la vue ne s’exécute pas
 def dashboard(request: HttpRequest) -> HttpResponse:
-    """User summary: his requests and engagements."""
-    return HttpResponse("Mon espace")
+    """User home page: summary of his requests and engagements."""
+    user = request.user #L’utilisateur connecté qui demande la page. On le range dans une variable plus courte
+    today = timezone.localdate()
+    context = {
+        "my_skills": user.skills.all(), #skills est le related_name du ManyToManyField dans ton modèle Skill
+        "my_requests": user.help_requests.filter(date__gte=today).select_related("skill", "helper"), #C’est le related_name du champ requester
+        "my_engagements": user.engagements.filter(date__gte=today).select_related("skill", "requester"), #C’est le related_name du champ helper
+    }
+    #pour le filtre : seulement celles d’aujourd’hui ou plus tard
+    #select_related( , ) c'est pour récupèrer en une seule fois la compétence et l’aidant de chaque demande et éviter plusieurs requetes
+    return render(request, "exchange/dashboard.html", context)
 
 
 def my_skills(request: HttpRequest) -> HttpResponse:

@@ -8,6 +8,7 @@
     <form method="post" class="panel">
         {% csrf_token %}
         {{ form.as_div }}
+        <input type="hidden" name="next" value="{{ next }}"> <!--Sans lui, après la connexion, il arrive sur « Mon espace » au lieu de la page qu’il avait demandée-->
         <button type="submit" class="button primary">Se connecter</button>
     </form>
     <p class="text">Pas encore de compte ? <a href="{% url 'exchange:signup' %}">S'inscrire</a></p>
