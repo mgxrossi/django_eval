@@ -1,8 +1,10 @@
 """Views of the skill exchange application."""
 
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.utils import timezone
+from django.contrib import messages
+from .forms import SignUpForm
 
 from .models import HelpRequest, Skill
 
@@ -17,9 +19,20 @@ def index(request: HttpRequest) -> HttpResponse:
     return render(request, "exchange/index.html", context)
 
 
+#structure classique de toute vue avec un formulaire
+#on arrive sur la page, le navigateur fait un GET, donc on passe dans le else. On crée un formulaire vide (SignUpForm()) et on affiche la page avec ce formulaire
+#on clique sur « S’inscrire », le navigateur envoie les données en POST
 def signup(request: HttpRequest) -> HttpResponse:
-    """Create a user account."""
-    return HttpResponse("Inscription")
+    """Create an account, then send the new user to the login page."""
+    if request.method == "POST":
+        form = SignUpForm(request.POST) #crée un formulaire rempli avec ce que l’utilisateur a tapé
+        if form.is_valid(): #Django vérifie tout
+            form.save() #Si tout est bon, on enregistre le nouvel utilisateur dans la base. Le mot de passe est chiffré automatiquement
+            messages.success(request, "Votre compte a été créé. Vous pouvez vous connecter.") #On prépare un message à afficher sur la page suivante
+            return redirect("exchange:login") #envoie l’utilisateur vers la page de connexion
+    else:
+        form = SignUpForm() #si pas valide on remet le formulaire
+    return render(request, "exchange/signup.html", {"form": form})
 
 
 def dashboard(request: HttpRequest) -> HttpResponse:

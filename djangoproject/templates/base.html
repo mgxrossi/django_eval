@@ -13,15 +13,34 @@
             Échange de compétences
             <small>L'entraide commence tout près</small>
         </a>
-        <div class="links">
-            {% if user.is_authenticated %} <!--Une condition : si l’utilisateur est connecté, on affiche « Mon espace », sinon « S’inscrire »-->
+                <div class="links">
+            {% if user.is_authenticated %} <!--condition que l'utilisateur soit auhentifié-->
                 <a href="{% url 'exchange:dashboard' %}">Mon espace</a>
-        {% endif %}
+                <span class="who">{{ user.first_name|default:user.username }}</span>
+                <form action="{% url 'exchange:logout' %}" method="post"> <!--La déconnexion est un bouton dans un formulaire, et non un simple lien. Depuis Django 5, la déconnexion n’accepte que POST-->
+                    {% csrf_token %} <!--jeton de sécurité, obligatoire dans tout formulaire POST-->
+                    <button type="submit" class="link">Se déconnecter</button>
+                </form>
+            {% else %}
+                <a href="{% url 'exchange:login' %}">Se connecter</a>
+            {% endif %}
         </div>
     </nav>
     {% endblock %}
 </header>
 <main>
+    <!--C’est ici que s’affiche le « Votre compte a été créé » préparé dans la vue.
+    Comme c’est dans base.html, les messages apparaîtront sur toutes les pages.
+    On s’en resservira pour UC6 (« Suppression impossible… »). message.tags vaut success ou error :
+    le CSS pourra colorer différemment les bons et les mauvais messages
+    -->
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
     {% block main %}{% endblock %} <!--Le trou principal, que chaque page remplit avec son contenu-->
 </main>
 </body>
