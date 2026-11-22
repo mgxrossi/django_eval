@@ -1,10 +1,11 @@
-"""Views of the skill exchange application."""
+"""Views of the skill exchange application"""
 
+from django.contrib.auth.decorators import login_required #réserver la page aux utilisateurs connectés
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import redirect, render
-from django.utils import timezone
-from django.contrib import messages
-from .forms import SignUpForm
+from django.shortcuts import redirect, render #render affiche le gabarit ; redirect envoie vers une autre page
+from django.utils import timezone #connaître la date d'aujourd'hui, pour savoir si un engagement est à venir
+from django.contrib import messages #afficher « Vos compétences ont été enregistrées » par ex
+from .forms import SignUpForm, SkillsForm
 
 from .models import HelpRequest, Skill
 
@@ -50,10 +51,38 @@ def dashboard(request: HttpRequest) -> HttpResponse:
     return render(request, "exchange/dashboard.html", context)
 
 
-def my_skills(request: HttpRequest) -> HttpResponse:
-    """Choose the skills the user owns."""
-    return HttpResponse("Mes compétences")
+@login_required
+def my_skills(request: HttpRequest) -> HttpResponse: #La fonction reçoit la requête du navigateur et renvoie une réponse
+    #Le nom my_skills : exactement celui écrit dans urls.py (views.my_skills)
+    user = request.user  #L'utilisateur connecté, rangé dans une variable plus courte, car on va s'en servir souvent
+    if request.method == "POST":  #lié aux cases que l'utilisateur a cochées
+        form = SkillsForm(request.POST)
+        if form.is_valid():
+            selected = set(form.cleaned_data["skills"])
+            #cleaned_data["skills"] contient les compétences cochées, déjà transformées en objets et set(…) les range dans un ensemble (collection sans doublons, sur laquelle on peut faire des soustractions)
+            removed = set(user.skills.all()) - selected #ce qu'il possédait avant moins ce qu'il a coché maintenant
+            today = timezone.localdate()
+            busy = user.engagements.filter(date__gte=today, skill__in=removed) #pour pas retirer compétences alors qu'il a un engagement dessus
+            if busy.exists():
+                names = ", ".join(sorted({slot.skill.name for slot in busy})) #fabrique la liste des compétences bloquées pour le message d'alerte
+                messages.error(
+                    request,
+                    f"Suppression impossible : vous avez des engagements en cours pour : {names}.",
+                )
+                return redirect("exchange:my_skills")
+            # recharge plutot que réaffiche donc repasse par le get et affiche les cases cochées avant le retrait
+            user.skills.set(selected)
+            #Si aucune compétence n'est bloquée, on enregistre.
+            messages.success(request, "Vos compétences ont été enregistrées.")
+            return redirect("exchange:dashboard")
+            #Le message vert, puis la redirection vers « Mon espace »
 
+    else:
+        #On crée un formulaire non lié avec les compétences qu'il a déja.
+        form = SkillsForm(initial={"skills": user.skills.all()})
+    return render(request, "exchange/my_skills.html", {"form": form})
+#On affiche le gabarit, en lui donnant le formulaire sous le nom form. C'est ce nom qu'on écrira dans le HTML : {{ form.as_div }}
+#Si form c'est invalide, on saute directement au return render(...)
 
 def create_request(request: HttpRequest) -> HttpResponse:
     """Ask for help on a day for a skill the user does not own."""

@@ -1,0 +1,16 @@
+{% extends "base.html" %} <!--reprend le bandeau, le CSS et la zone des messages-->
+
+{% block title %}Mes compétences – Échange de compétences{% endblock %}
+
+{% block main %}
+<div class="form-page">
+    <h1>Mes compétences</h1>
+    <form method="post" class="panel">
+    <!-- envoie les cases cochées en POST, car on modifie la base-->
+        {% csrf_token %} <!-- jeton de sécurité, obligatoire en POST-->
+        {{ form.as_div }} <!--écrit les cases, l'étiquette et le texte d'aide-->
+        <button type="submit" class="button primary">Enregistrer</button>
+    </form>
+    <p class="text"><a href="{% url 'exchange:dashboard' %}">Retour à mon espace</a></p>
+</div>
+{% endblock %}

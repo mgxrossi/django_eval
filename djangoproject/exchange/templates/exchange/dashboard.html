@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Mon espace – Échange de compétences{% endblock %}
+
+{% block main %}
+<h1>Bonjour {{ user.first_name|default:user.username }}</h1>
+
+<!--Avec Django : une ligne par élément de la liste
+Dans mon gabarit, je n’écris pas chaque ligne à la main. La boucle % for % fabrique un <tr> par engagement
+Avec 3 engagements, Django écrit 3 lignes <tr>, chacune avec ses 3 cases <td> remplies-->
+<p class="my-skills">
+    Mes compétences :
+    {% for skill in my_skills %}
+        <span class="tag">{{ skill.name }}</span>
+    {% empty %}
+        <em>aucune pour l'instant</em>
+    {% endfor %}
+    – <a href="{% url 'exchange:my_skills' %}">modifier</a>
+</p>
+
+<div class="buttons">
+    <a class="button primary" href="{% url 'exchange:search' %}">Proposer mon aide</a>
+    <a class="button secondary" href="{% url 'exchange:create_request' %}">Demander de l'aide</a>
+</div>
+
+<h2>Mes engagements à venir</h2>
+{% if my_engagements %}
+<table>
+    <thead>
+        <tr><th>Date</th><th>Compétence</th><th>Activité</th><th>J'aide</th><th>Courriel</th></tr>
+    </thead>
+    <tbody>
+    {% for slot in my_engagements %}
+        <tr>
+            <td>{{ slot.date|date:"D j M Y" }}</td>
+            <td>{{ slot.skill.name }}</td>
+            <td>{{ slot.activity }}</td>
+            <td>{{ slot.requester.first_name }} {{ slot.requester.last_name }}</td>
+            <td><a href="mailto:{{ slot.requester.email }}">{{ slot.requester.email }}</a></td>
+            <!--Un lien qui ouvre la messagerie, avec l’adresse déjà remplie-->
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="empty">Vous n'êtes engagé(e) sur aucun créneau.</p>
+{% endif %}
+
+<h2>Mes demandes d'aide à venir</h2>
+{% if my_requests %}
+<table>
+    <thead>
+        <tr><th>Date</th><th>Compétence</th><th>Activité</th><th>Aidant</th><th>Courriel</th></tr>
+    </thead>
+    <tbody>
+    {% for slot in my_requests %} <!--Si la demande a un aidant, on affiche son nom et son courrie-->
+        <tr>
+            <td>{{ slot.date|date:"D j M Y" }}</td>
+            <td>{{ slot.skill.name }}</td>
+            <td>{{ slot.activity }}</td>
+            {% if slot.helper %}
+                <td>{{ slot.helper.first_name }} {{ slot.helper.last_name }}</td>
+                <td><a href="mailto:{{ slot.helper.email }}">{{ slot.helper.email }}</a></td>
+            {% else %}
+                <td colspan="2"><em>En attente d'un aidant</em></td>
+            {% endif %}
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="empty">Vous n'avez aucune demande en cours.</p>
+{% endif %}
+{% endblock %}

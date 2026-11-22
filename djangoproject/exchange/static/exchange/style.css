@@ -65,3 +65,16 @@ button.link { background: none; padding: 0; color: inherit; text-decoration: und
 .messages { list-style: none; padding: 0; margin: 0 0 20px; }
 .messages li { padding: 12px 16px; border-radius: 6px; background: #e3f4ea; color: #1e5b3a; }
 .messages li.error { background: #fde2df; color: #8a1c12; }
+
+/* Mon espace */
+.my-skills { margin: 8px 0 20px; }
+main h2 { margin-top: 32px; }
+table { width: 100%; border-collapse: collapse; background: white; border: 1px solid #ebe8f2; border-radius: 8px; overflow: hidden; font-size: 14px; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid #ebe8f2; }
+th { background: #f1eefa; color: #4c3a8f; font-weight: 600; }
+td a { color: #6b46c1; }
+
+/* Mes compétences : cases à cocher
+id_skills est l'identifiant que Django donne automatiquement au champ skills */
+#id_skills div { margin: 6px 0; }
+#id_skills label { display: inline; font-weight: 400; }
