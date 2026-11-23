@@ -99,3 +99,28 @@ class HelpRequestForm(forms.ModelForm): # 1) déclaration. Hérite de forms.Mode
         #skill and date : on ne vérifie que si les deux sont valides
         #on cherche une demande existante du même utilisateur (self.user, gardé dans __init__), même compétence, même date
         return cleaned_data
+
+
+class HelpSearchForm(forms.Form):
+    """Filter open help requests by skill and date."""
+
+    skill = forms.ModelChoiceField( #ModelChoiceField : un choix unique parmi des compétences, liste déroulante
+        label="Compétence",
+        queryset=Skill.objects.none(), #on veut proposer seulement les compétences de la personne connectée, et qu'ici, dans la classe, on ne sait pas encore qui c'est donc vide. On remplira la liste dans __init__
+        required=False,
+        empty_label="Toutes mes compétences",
+    )
+    date = forms.DateField( #case qui attend une date
+        label="Date",
+        required=False,
+        widget=forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"),
+    )
+
+
+    #C'est la même formule que dans « Demander de l'aide » :
+     #le formulaire reçoit la personne (user) ;
+     #super()… : Django prépare d'abord le formulaire normalement ;
+     #on remplit la liste déroulante avec ses compétences (user.skills.all()).
+    def __init__(self, *args, user, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["skill"].queryset = user.skills.all()

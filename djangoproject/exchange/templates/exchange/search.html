@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Proposer mon aide – Échange de compétences{% endblock %}
+
+{% block main %}
+<h1>Proposer mon aide</h1>
+<p class="text">Voici les demandes des autres utilisateurs pour les compétences que vous possédez.</p>
+
+{% if not user.skills.exists %}
+    <p class="empty">Vous n'avez déclaré aucune compétence.
+        <a href="{% url 'exchange:my_skills' %}">Indiquez vos compétences</a> pour voir les demandes.</p>
+{% else %}
+    <form method="get" class="search">
+        {{ form.as_div }}
+        <button type="submit" class="button primary">Rechercher</button>
+    </form>
+
+    {% if results %}
+    <table>
+        <thead>
+            <tr><th>Date</th><th>Compétence</th><th>Activité</th><th>Demandeur</th></tr>
+        </thead>
+        <tbody>
+        {% for slot in results %}
+            <tr>
+                <td>{{ slot.date|date:"D j M Y" }}</td>
+                <td>{{ slot.skill.name }}</td>
+                <td>{{ slot.activity }}</td>
+                <td>{{ slot.requester.first_name }} {{ slot.requester.last_name }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="empty">Aucune demande ne correspond à votre recherche.</p>
+    {% endif %}
+{% endif %}
+{% endblock %}

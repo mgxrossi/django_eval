@@ -85,3 +85,11 @@ form select, form input[type=date] {
     width: 100%; padding: 9px; border: 1px solid #d9d4ea; border-radius: 6px; font: inherit;
 }
 .errorlist.nonfield { background: #fde2df; padding: 10px 14px 10px 30px; border-radius: 6px; }
+
+
+/* Proposer mon aide : filtres côte à côte */
+.search { display: flex; gap: 16px; align-items: end; flex-wrap: wrap;
+          background: white; border: 1px solid #ebe8f2; border-radius: 8px;
+          padding: 16px 20px; margin: 16px 0 24px; }
+.search div { margin: 0; }
+.search label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 4px; }

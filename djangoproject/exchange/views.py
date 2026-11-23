@@ -5,7 +5,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render #render affiche le gabarit ; redirect envoie vers une autre page
 from django.utils import timezone #connaître la date d'aujourd'hui, pour savoir si un engagement est à venir
 from django.contrib import messages #afficher « Vos compétences ont été enregistrées » par ex
-from .forms import HelpRequestForm, SignUpForm, SkillsForm
+from .forms import HelpRequestForm, HelpSearchForm, SignUpForm, SkillsForm
 
 from .models import HelpRequest, Skill
 
@@ -103,9 +103,25 @@ def create_request(request: HttpRequest) -> HttpResponse:
     return render(request, "exchange/request_form.html", {"form": form})
 
 
+@login_required
 def search_requests(request: HttpRequest) -> HttpResponse:
-    """Search open help requests matching the user's skills."""
-    return HttpResponse("Rechercher des demandes")
+    """Open help requests of other users, for the skills of the user."""
+    user = request.user
+    today = timezone.localdate()
+    results = (
+        HelpRequest.objects.filter(
+            date__gte=today, helper__isnull=True, skill__in=user.skills.all()
+        )
+        .exclude(requester=user)
+        .select_related("skill", "requester")
+    )
+    form = HelpSearchForm(request.GET or None, user=user)
+    if form.is_valid():
+        if form.cleaned_data["skill"]:
+            results = results.filter(skill=form.cleaned_data["skill"])
+        if form.cleaned_data["date"]:
+            results = results.filter(date=form.cleaned_data["date"])
+    return render(request, "exchange/search.html", {"form": form, "results": results})
 
 
 def offer_help(request: HttpRequest, pk: int) -> HttpResponse:
