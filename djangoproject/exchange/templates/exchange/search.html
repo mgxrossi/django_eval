@@ -18,7 +18,8 @@
     {% if results %}
     <table>
         <thead>
-            <tr><th>Date</th><th>Compétence</th><th>Activité</th><th>Demandeur</th></tr>
+           <tr><th>Date</th><th>Compétence</th><th>Activité</th><th>Demandeur</th><th></th></tr>
+        <!--Le dernier <th></th> est vide : c'est la colonne du bouton, qui n'a pas besoin de titre-->
         </thead>
         <tbody>
         {% for slot in results %}
@@ -27,6 +28,12 @@
                 <td>{{ slot.skill.name }}</td>
                 <td>{{ slot.activity }}</td>
                 <td>{{ slot.requester.first_name }} {{ slot.requester.last_name }}</td>
+                <td>
+                    <form action="{% url 'exchange:offer_help' slot.pk %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="button primary">Je me rends disponible</button>
+                    </form>
+                </td>
             </tr>
         {% endfor %}
         </tbody>

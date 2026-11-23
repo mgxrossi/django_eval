@@ -2,7 +2,8 @@
 
 from django.contrib.auth.decorators import login_required #réserver la page aux utilisateurs connectés
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import redirect, render #render affiche le gabarit ; redirect envoie vers une autre page
+from django.shortcuts import get_object_or_404, redirect, render #render affiche le gabarit ; redirect envoie vers une autre page ; retrouver la demande à partir de son numéro, ou afficher une page « 404 introuvable »
+from django.views.decorators.http import require_POST #un garde qui n'accepte que les clics sur un bouton
 from django.utils import timezone #connaître la date d'aujourd'hui, pour savoir si un engagement est à venir
 from django.contrib import messages #afficher « Vos compétences ont été enregistrées » par ex
 from .forms import HelpRequestForm, HelpSearchForm, SignUpForm, SkillsForm
@@ -124,6 +125,38 @@ def search_requests(request: HttpRequest) -> HttpResponse:
     return render(request, "exchange/search.html", {"form": form, "results": results})
 
 
-def offer_help(request: HttpRequest, pk: int) -> HttpResponse:
-    """Commit the user to help on request number pk."""
-    return HttpResponse(f"Se rendre disponible pour la demande {pk}")
+@login_required
+@require_POST
+def offer_help(request: HttpRequest, pk: int) -> HttpResponse:     #La vue reçoit la requête et pk, le numéro lu dans l'adresse
+    """engage l utilisateur sur une demande en particulier"""
+    help_request = get_object_or_404(HelpRequest, pk=pk) #Va chercher dans la table HelpRequest la demande qui porte ce numéro
+    user = request.user
+
+    error = None #variable error, vide au départ, ensuite une serie de questions
+    if help_request.requester == user:
+        error = "Vous ne pouvez pas répondre à votre propre demande."
+    elif not user.skills.filter(pk=help_request.skill_id).exists():
+        error = "Vous ne possédez pas la compétence demandée."
+    elif help_request.date < timezone.localdate():
+        error = "Ce créneau est passé."
+    elif user.engagements.filter(date=help_request.date).exists():
+        error = "Vous êtes déjà engagé(e) sur un autre créneau ce jour-là."
+
+    if error:
+        messages.error(request, error)
+        return redirect("exchange:search")
+    #Si un message d'erreur a été écrit on l'affiche en rouge, et on renvoie l'utilisateur vers la recherche. Rien n'est enregistré
+
+    updated = HelpRequest.objects.filter(pk=pk, helper__isnull=True).update(helper=user)
+    #par ex : prends la demande n°12, seulement si sa case aidant est encore vide
+    #.update(helper=user) : et écris le nom de l'utilisateur dans la case aidant ;
+    if updated == 0:
+        #Django répond combien de lignes il a modifiées : 1 si ça a marché, 0 sinon
+        messages.error(request, "Ce créneau vient d'être pris par un autre utilisateur.")
+        return redirect("exchange:search")
+
+    messages.success(
+        request,
+        f"C'est noté : vous aidez {help_request.requester.first_name} le {help_request.date:%d/%m/%Y}.",
+    )
+    return redirect("exchange:dashboard")

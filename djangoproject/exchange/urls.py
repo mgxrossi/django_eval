@@ -16,6 +16,7 @@ urlpatterns = [
     path("requests/new/", views.create_request, name="create_request"),
     path("requests/search/", views.search_requests, name="search"),
     path("requests/<int:pk>/offer/", views.offer_help, name="offer_help"),
+    #Cette adresse a une partie qui change : <int:pk>. C'est le numéro de la demande sur laquelle on clique
     path("login/", auth_views.LoginView.as_view(), name="login"), #La vue toute faite qui affiche le formulaire de connexion
                                              # Ces vues de Django sont des classes, pas des fonctions .as_view() les transforme en quelque chose que path() sait utiliser
     path("logout/", auth_views.LogoutView.as_view(), name="logout"), #La vue toute faite qui déconnecte l’utilisateur
