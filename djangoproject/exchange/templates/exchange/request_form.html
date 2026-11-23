@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Demander de l'aide – Échange de compétences{% endblock %}
+
+{% block main %}
+<div class="form-page">
+    <h1>Demander de l'aide</h1>
+    <p class="text">Choisissez une compétence que vous ne possédez pas, le jour souhaité et décrivez l'activité.</p>
+    <form method="post" class="panel">
+        {% csrf_token %}
+        {{ form.as_div }}
+        <button type="submit" class="button primary">Envoyer ma demande</button>
+    </form>
+    <p class="text"><a href="{% url 'exchange:dashboard' %}">Retour à mon espace</a></p>
+</div>
+{% endblock %}
+

@@ -78,3 +78,10 @@ td a { color: #6b46c1; }
 id_skills est l'identifiant que Django donne automatiquement au champ skills */
 #id_skills div { margin: 6px 0; }
 #id_skills label { display: inline; font-weight: 400; }
+
+
+/* Demander de l'aide : liste déroulante et calendrier */
+form select, form input[type=date] {
+    width: 100%; padding: 9px; border: 1px solid #d9d4ea; border-radius: 6px; font: inherit;
+}
+.errorlist.nonfield { background: #fde2df; padding: 10px 14px 10px 30px; border-radius: 6px; }

@@ -5,7 +5,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render #render affiche le gabarit ; redirect envoie vers une autre page
 from django.utils import timezone #connaître la date d'aujourd'hui, pour savoir si un engagement est à venir
 from django.contrib import messages #afficher « Vos compétences ont été enregistrées » par ex
-from .forms import SignUpForm, SkillsForm
+from .forms import HelpRequestForm, SignUpForm, SkillsForm
 
 from .models import HelpRequest, Skill
 
@@ -84,9 +84,23 @@ def my_skills(request: HttpRequest) -> HttpResponse: #La fonction reçoit la req
 #On affiche le gabarit, en lui donnant le formulaire sous le nom form. C'est ce nom qu'on écrira dans le HTML : {{ form.as_div }}
 #Si form c'est invalide, on saute directement au return render(...)
 
+
+#C'est le même schéma GET / POST que Mes compétences
+
+@login_required
 def create_request(request: HttpRequest) -> HttpResponse:
-    """Ask for help on a day for a skill the user does not own."""
-    return HttpResponse("Demander de l'aide")
+    """Demande d'aide sur un jour précis, pour une compétence que l'utilisateur n'a pas"""
+    if request.method == "POST":
+        form = HelpRequestForm(request.POST, user=request.user)
+        if form.is_valid():
+            help_request = form.save(commit=False)
+            help_request.requester = request.user
+            help_request.save()
+            messages.success(request, "Votre demande d'aide a été enregistrée.")
+            return redirect("exchange:dashboard")
+    else:
+        form = HelpRequestForm(user=request.user)
+    return render(request, "exchange/request_form.html", {"form": form})
 
 
 def search_requests(request: HttpRequest) -> HttpResponse:
