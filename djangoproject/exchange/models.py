@@ -14,6 +14,7 @@ class Skill(models.Model):
 
     name = models.CharField("nom", max_length=100, unique=True) #interdit deux compétences avec le même nom
     owners = models.ManyToManyField( #le lien possède de mon diagramme a 0..* des deux cotés donc Django créé une table de liaison cachée compétence ↔ utilisateur
+                              #ManyToMany veut dire ici plusieurs personnes par compétence, plusieurs compétences par personne. Django sait qu'il faut alors un tableau en plus, et il le crée lui-même dans la migration : exchange_skill_owners
         settings.AUTH_USER_MODEL, #désigne le User fourni par Django
         related_name="skills", #le nom du lien vu depuis l’utilisateur : je pourrais faire margaux.skills.all() pour avoir mes compétences.
         blank=True, #compétence pas obligatoire

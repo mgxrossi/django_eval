@@ -11,6 +11,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        #« avant d'appliquer cette migration, la table des utilisateurs doit déjà exister »
     ]
 
     operations = [
